@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Drawing</title>
+    <style>
+        body {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid black;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+<body>
+    <input type="color" id="colorPicker" value="#000000">
+    <button onclick="changeBrushSize()">Change Brush Size</button>
+    <button onclick="toggleEraser()">Eraser</button>
+    <button onclick="cleanCanvas()">Clean all</button>
+    <canvas id="drawingCanvas" width="1100" height="720"></canvas>
+    <script>
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        const colorPicker = document.getElementById('colorPicker');
+        const brushSizeButton = document.querySelector('button');
+        const eraserButton = document.querySelectorAll('button')[1];
+
+        let isDrawing = false;
+        let isErasing = false;
+        let currentColor = '#000000';
+        let brushSize = 5; // Initial brush size
+
+        canvas.addEventListener('mousedown', (event) => {
+            isDrawing = true;
+            if (isErasing) {
+                ctx.globalCompositeOperation = 'destination-out'; // Используем режим стирания
+            } else {
+                ctx.globalCompositeOperation = 'source-over'; // Используем режим рисования
+            }
+            ctx.beginPath();
+            draw(event);
+        });
+
+        canvas.addEventListener('mousemove', (event) => {
+            if (isDrawing) {
+                draw(event);
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDrawing = false;
+        });
+
+        colorPicker.addEventListener('input', (event) => {
+            currentColor = event.target.value;
+        });
+
+        function changeBrushSize() {
+            brushSize = parseInt(prompt("Enter brush size:", brushSize));
+        }
+
+        function toggleEraser() {
+            isErasing = !isErasing;
+            if (isErasing) {
+                eraserButton.textContent = 'Drawing';
+            } else {
+                eraserButton.textContent = 'Eraser';
+            }
+        }
+
+        function draw(event) {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            ctx.lineWidth = brushSize; // Brush size
+            ctx.lineCap = 'round'; // Smooth edges
+            ctx.strokeStyle = currentColor;
+            
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        function cleanCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    </script>
+</body>
+</html>
