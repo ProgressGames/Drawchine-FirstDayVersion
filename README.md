@@ -1,1 +1,0 @@
-# Drawchine-FirstDayVersion
